@@ -8,6 +8,7 @@ exports.capabilities = {
   'platformName':'ios', // OS name
   'deviceName': 'iPhone 12 Pro', // Device name
   'platformVersion': '15', // OS version
+  'browserName' : '',
   'app' : 'lt://proverbial-ios',     // Add app (.ipa) url here
   'isRealMobile' : true,
   'visual': false,  // To take step by step screenshot

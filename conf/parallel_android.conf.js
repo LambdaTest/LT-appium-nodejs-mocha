@@ -18,11 +18,13 @@ var config = {
       'platformName':'android', // OS name
       'deviceName': 'Galaxy S10', // Device name
       'platformVersion': '11', // OS version
+      'browserName' : '',
     },
     {
         'platformName':'android', // OS name
         'deviceName': 'Galaxy S10+', // Device name
         'platformVersion': '11', // OS version
+        'browserName' : '',
     }
   ]
 };
