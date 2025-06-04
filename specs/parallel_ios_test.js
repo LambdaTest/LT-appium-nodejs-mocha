@@ -1,60 +1,41 @@
-const { default: driver } = require("appium-android-driver");
-const { until } = require("selenium-webdriver");
 const { By } = require("selenium-webdriver");
-const by = require("selenium-webdriver/lib/by");
+const wd = require('wd');
+const path = require('path');
 
-
-
-require('appium-base-driver')
-var assert= require("assert"),
-  webdriver = require("selenium-webdriver"),
-   conf_file= process.argv[3] || "conf/parallel_ios.conf.js";
- 
-
+var conf_file = process.argv[3] || "conf/parallel_ios.conf.js";
 var capabilities = require("../" + conf_file).capabilities;
+const LT_USERNAME = process.env.LT_USERNAME || "LT_USERNAME";
+const LT_ACCESS_KEY = process.env.LT_ACCESS_KEY || "LT_ACCESS_KEY";
 
 var buildDriver = function(caps) {
-  return new webdriver.Builder()
-    .usingServer(
-      "http://" +
-        LT_USERNAME +
-        ":" +
-        LT_ACCESS_KEY +
-        "@mobile-hub.lambdatest.com/wd/hub"
-    )
-    .withCapabilities(caps)
-    .build();
+  return wd.promiseChainRemote(
+    `https://${LT_USERNAME}:${LT_ACCESS_KEY}@mobile-hub.lambdatest.com/wd/hub`
+  );
 };
 
-capabilities.forEach(function(caps) {
+describe("Mocha Parallel iOS Test", function() {
+  this.timeout(0);
 
-  describe( "Mocha iOS Parallel Test "+caps.browserName, function() {
-    var driver;
-    this.timeout(0);
-
-    it ('Application is launched', function name(done) { 
-        driver=buildDriver(caps);
-        driver.findElement(By.xpath('//XCUIElementTypeButton[@name="color"]')).click().then(function(){
-          console.log("Successfully clicked Color");
-        
-        });
-        driver.findElement(By.xpath('//XCUIElementTypeStaticText[@name="Notification"]')).click().then(function(){
-          console.log("Successfully clicked Notification");
-        });
-        driver.findElement(By.xpath('//XCUIElementTypeStaticText[@name="Toast"]')).click().then(function(){
-            console.log("Successfully clicked Toast");
+  it('Application is launched on all devices', async function() {
+    const testPromises = capabilities.map(async (caps) => {
+      const driver = buildDriver(caps);
+      await driver.init(caps);
+      
+      await driver.elementById('color').click();
+      console.log(`Successfully clicked Color on ${caps.deviceName}`);
+      
+      await driver.elementById('Text').click();
+      console.log(`Successfully clicked Text on ${caps.deviceName}`);
+      
+      await driver.elementById('notification').click();
+      console.log(`Successfully clicked Notification on ${caps.deviceName}`);
+      
+      await driver.elementById('toast').click();
+      console.log(`Successfully clicked Toast on ${caps.deviceName}`);
+      
+      await driver.quit();
     });
 
-          var button = driver.wait(until.elementLocated(By.xpath('//XCUIElementTypeStaticText[@name="GeoLocation"]')), 10000);
-           button.click();
-             console.log("Successfully clicked GeoLocation")
-             driver.quit().then(function(){
-            done();
-        
-        });
-    
-     });
-
-    });
-
+    await Promise.all(testPromises);
   });
+});
