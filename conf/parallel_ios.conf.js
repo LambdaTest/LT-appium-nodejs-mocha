@@ -1,36 +1,50 @@
-LT_USERNAME = process.env.LT_USERNAME || "<your username>";          //Enter your LambdaTest username here
-LT_ACCESS_KEY = process.env.LT_ACCESS_KEY || "<your accessKey>";      //Enter your LambdaTest accessKey here
+const LT_USERNAME = process.env.LT_USERNAME || "your_username";
+const LT_ACCESS_KEY = process.env.LT_ACCESS_KEY || "your_key";
 
-var config = {
-  commanCapabilities: {
-    'build': 'Mocha-iOS-Parallel-Sample', //Build name
-    'name': 'Mocha-iOS-Parallel', // Test name
-    'app' : 'lt://proverbial-ios',   //Add app (.ipa) url here 
-    'isRealMobile' : true,
-    'visual': false,  // To take step by step screenshot
-    'network':false,  // To capture network Logs
-    'console':false, // To capture console logs.
-    'tunnel': false 
-  },
-  multiCapabilities: [
-    {
-      // Desired capabilities
-      'platformName':'ios', // OS name
-      'deviceName': 'iPhone XS', // Device name
-      'platformVersion': '13', // OS version
-    },
-    {
-        'platformName':'ios', // OS name
-    'deviceName': 'iPhone 13 Pro', // Device name
-    'platformVersion': '15', // OS version
-    }
-  ]
+const commonCapabilities = {
+
+  browserName: '',                
+  platformName: 'iOS',
+  'appium:isRealMobile': true,
+
+  'lt:options': {
+    user: LT_USERNAME,
+    accessKey: LT_ACCESS_KEY,
+   
+    app: 'lt://proverbial-ios', 
+    build: 'Mocha-iOS-Parallel-Final',
+    tunnel: false,
+    visual: false,
+    network: false,
+    console: true,
+    w3c: true,
+    
+    isRealMobile: true 
+  }
 };
 
-exports.capabilities = [];
-// Code to support common capabilities
-config.multiCapabilities.forEach(function(caps) {
-  var temp_caps = JSON.parse(JSON.stringify(config.commanCapabilities));
-  for (var i in caps) temp_caps[i] = caps[i];
-  exports.capabilities.push(temp_caps);
-});
+const devices = [
+  {
+    deviceName: 'iPhone 15.*',
+    platformVersion: '17',
+    testName: 'Test-iPhone-15'
+  },
+  {
+    deviceName: 'iPhone 14.*',
+    platformVersion: '16',
+    testName: 'Test-iPhone-14'
+  }
+];
+
+exports.capabilities = devices.map(device => ({
+  ...commonCapabilities,
+  'lt:options': {
+    ...commonCapabilities['lt:options'],
+    deviceName: device.deviceName,
+    platformVersion: device.platformVersion,
+    name: device.testName
+  }
+}));
+
+exports.LT_USERNAME = LT_USERNAME;
+exports.LT_ACCESS_KEY = LT_ACCESS_KEY;

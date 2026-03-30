@@ -1,31 +1,16 @@
 {
   "name": "mocha-selenium-sample",
-  "description": " Selenium examples for Mocha and LambdaTest",
+  "version": "1.0.0",
   "scripts": {
-    "test": "npm run android && npm run ios && npm run parallel_android && npm run parallel_ios",
-    "parallel_android": "cross-env CONFIG_FILE=parallel_android ./node_modules/.bin/mocha specs/parallel_android_test.js conf/parallel_android.conf.js --timeout=100000",
-    "ios": "cross-env CONFIG_FILE=ios ./node_modules/.bin/mocha specs/ios_test.js conf/ios.conf.js",
-    "android": "cross-env CONFIG_FILE=android ./node_modules/.bin/mocha specs/android_test.js conf/android.conf.js",
-    "parallel_ios" :"cross-env CONFIG_FILE=parallel_ios ./node_modules/.bin/mocha specs/parallel_ios_test.js conf/parallel_ios.conf.js --timeout=100000"
+    "android": "mocha specs/android_test.js conf/android.conf.js",
+    "ios": "mocha specs/ios_test.js --timeout 300000",
+    "parallel_ios": "mocha specs/parallel_ios_test.js --timeout 300000",
+    "parallel_android": "mocha specs/parallel_android_test.js --timeout 300000"
   },
-  "keywords": [
-    "mocha",
-    "LambdaTest",
-    "selenium",
-    "examples"
-  ],
-  "author": "Kavita Bhatt",
   "dependencies": {
-    "appium-android-driver": "^5.4.0",
+    "appium-android-driver": "^12.7.0",
     "appium-base-driver": "^7.11.3",
-    "bluebird": "^3.4.6",
-    "install": "^0.13.0",
-    "mocha": "^9.2.2",
-    "selenium-webdriver": "^3.6.0",
-    "wd": "^1.14.0"
-  },
-  "devDependencies": {
-    "cross-env": "^7.0.3",
-    "grunt-mocha-appium": "^0.4.0"
+    "mocha": "^10.2.0",
+    "selenium-webdriver": "^4.41.0"
   }
 }

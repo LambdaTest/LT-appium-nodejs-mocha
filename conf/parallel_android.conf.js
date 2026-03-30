@@ -1,36 +1,39 @@
-LT_USERNAME = process.env.LT_USERNAME || "<your username>";       //Enter your LambdaTest username here
-LT_ACCESS_KEY = process.env.LT_ACCESS_KEY || "<your accessKey>";   //Enter your LambdaTest accessKey here
+const LT_USERNAME = process.env.LT_USERNAME || "your_username";
+const LT_ACCESS_KEY = process.env.LT_ACCESS_KEY || "your_key";
 
-var config = {
-  commanCapabilities: {
-    build: "Mocha-Android-Parallel-Sample", //Build name
-    name: 'Mocha-Android parallel', // Test name
-    tunnel: false, // Make it true to run the localhost through tunnel
-    app : 'lt://proverbial-android',  // Add app (.apk) url here
-    isRealMobile : true,
-    visual: false,  // To take step by step screenshot
-    network:false,  // To capture network Logs
-    console:false, // To capture console logs.
-  },
-  multiCapabilities: [
-    {
-      // Desired capabilities
-      'platformName':'android', // OS name
-      'deviceName': 'Galaxy S10', // Device name
-      'platformVersion': '11', // OS version
-    },
-    {
-        'platformName':'android', // OS name
-        'deviceName': 'Galaxy S10+', // Device name
-        'platformVersion': '11', // OS version
-    }
-  ]
+const commonCapabilities = {
+  browserName: '', 
+  platformName: 'Android',
+  'appium:app': 'lt://proverbial-android',
+  'appium:isRealMobile': true,
+
+  'lt:options': {
+    user: LT_USERNAME,
+    accessKey: LT_ACCESS_KEY,
+    build: 'Android-Real-Device-Parallel',
+    name: 'Mocha-Android-Parallel',
+    tunnel: false,
+    visual: false,
+    network: false,
+    console: true,
+    w3c: true 
+  }
 };
 
-exports.capabilities = [];
-// Code to support common capabilities
-config.multiCapabilities.forEach(function(caps) {
-  var temp_caps = JSON.parse(JSON.stringify(config.commanCapabilities));
-  for (var i in caps) temp_caps[i] = caps[i];
-  exports.capabilities.push(temp_caps);
-});
+const devices = [
+  { name: 'Galaxy.*', ver: '12' },
+  { name: 'Galaxy.*', ver: '11' }
+];
+
+exports.capabilities = devices.map(device => ({
+  ...commonCapabilities,
+ 
+  'lt:options': {
+    ...commonCapabilities['lt:options'],
+    deviceName: device.name,
+    platformVersion: device.ver
+  }
+}));
+
+exports.LT_USERNAME = LT_USERNAME;
+exports.LT_ACCESS_KEY = LT_ACCESS_KEY;

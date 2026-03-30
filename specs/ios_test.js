@@ -1,51 +1,57 @@
-const driver= require("appium-base-driver")
-
-//const { default: driver } = require("appium-android-driver/build/lib/driver");
+const webdriver = require("selenium-webdriver");
 const { By } = require("selenium-webdriver");
-const { element } = require("wd/lib/element-commands");
 
-require("appium-base-driver")
-var assert= require("assert"),
-  webdriver = require("selenium-webdriver"),
-   conf_file= process.argv[3] || "conf/ios.conf.js";
- 
 
-var caps = require("../" + conf_file).capabilities;
+const config = require("../conf/ios.conf.js");
 
-var buildDriver = function(caps) {
+// Credentials
+const LT_USERNAME = config.LT_USERNAME || "your_username";
+const LT_ACCESS_KEY = config.LT_ACCESS_KEY || "your_key";
+
+const caps = config.capabilities;
+
+
+async function buildDriver(capabilities) {
   return new webdriver.Builder()
     .usingServer(
-      "http://" +
-      LT_USERNAME +
-      ":" +
-      LT_ACCESS_KEY +
-      "@mobile-hub.lambdatest.com/wd/hub"
+      `http://${LT_USERNAME}:${LT_ACCESS_KEY}@mobile-hub.lambdatest.com/wd/hub`
     )
-    .withCapabilities(caps)
+    .withCapabilities(capabilities)
     .build();
-};
+}
 
-describe("Mocha Appium iOS Test " + caps.browserName, function() {
-  var driver;
+describe("Mocha Appium iOS Single Device Test", function () {
+  let driver;
   this.timeout(0);
-    it ('Application is launched', function name(done) { 
-        driver=buildDriver(caps);
-        driver.findElement(By.xpath('//XCUIElementTypeButton[@name="color"]')).click().then(function(){
-          console.log("Successfully clicked Color");
-        
-        });
-        driver.findElement(By.xpath('//XCUIElementTypeStaticText[@name="Notification"]')).click().then(function(){
-          console.log("Successfully clicked Notification");
-        });
-        driver.findElement(By.xpath('//XCUIElementTypeStaticText[@name="Toast"]')).click().then(function(){
-            console.log("Successfully clicked Toast");
-    });
-         driver.findElement(By.xpath('//XCUIElementTypeButton[@name="Text"]')).click().then(function(){
-             console.log("Successfully clicked Text");
-             driver.quit()
-    });  
-});
-});
 
+  it("Application is launched and actions performed", async function () {
+   
+    driver = await buildDriver(caps);
 
-    
+    try {
+      console.log("iOS Test Started...");
+
+      await driver.findElement(By.xpath('//XCUIElementTypeButton[@name="color"]')).click();
+      console.log("Successfully clicked Color");
+
+      await driver.findElement(By.xpath('//XCUIElementTypeStaticText[@name="Notification"]')).click();
+      console.log("Successfully clicked Notification");
+
+      await driver.findElement(By.xpath('//XCUIElementTypeStaticText[@name="Toast"]')).click();
+      console.log("Successfully clicked Toast");
+
+      await driver.findElement(By.xpath('//XCUIElementTypeButton[@name="Text"]')).click();
+      console.log("Successfully clicked Text");
+
+    } catch (err) {
+      console.error("iOS Test Error: ", err.message);
+      throw err;
+    } finally {
+      
+      if (driver) {
+        await driver.quit();
+        console.log("iOS Session Closed.");
+      }
+    }
+  });
+});

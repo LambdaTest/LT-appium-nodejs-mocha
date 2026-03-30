@@ -1,17 +1,26 @@
-
-LT_USERNAME = process.env.LT_USERNAME || "<your username>";        //Enter your LambdaTest username here
-LT_ACCESS_KEY = process.env.LT_ACCESS_KEY || "<your accessKey>";    //Enter your LambdaTest accessKey here
+const LT_USERNAME = process.env.LT_USERNAME || "your_username";
+const LT_ACCESS_KEY = process.env.LT_ACCESS_KEY || "your_key";
 
 exports.capabilities = {
-  'build': 'Mocha-iOS-Sample', //Build name
-  'name': 'Mocha-iOS', // Test name
-  'platformName':'ios', // OS name
-  'deviceName': 'iPhone 12 Pro', // Device name
-  'platformVersion': '15', // OS version
-  'app' : 'lt://proverbial-ios',     // Add app (.ipa) url here
-  'isRealMobile' : true,
-  'visual': false,  // To take step by step screenshot
-  'network':false,  // To capture network Logs
-  'console':false, // To capture console logs.
-  'tunnel': false // If you want to run the localhost than change it to true
-  };
+  'browserName': '',
+  'platformName': 'ios',
+  'appium:deviceName': 'iPhone 15',
+  'appium:platformVersion': '17',
+  'appium:app': 'lt://proverbial-ios',
+  'appium:isRealMobile': true,
+
+  'lt:options': {
+    'w3c': true,
+    'project': 'Mocha_iOS_Single',
+    'build': 'Mocha-iOS-Single-Build',
+    'name': 'Mocha-Single-Test',
+    'user': LT_USERNAME,
+    'accessKey': LT_ACCESS_KEY,
+    'visual': true,
+    'network': true,
+    'console': true
+  }
+};
+
+exports.LT_USERNAME = LT_USERNAME;
+exports.LT_ACCESS_KEY = LT_ACCESS_KEY;

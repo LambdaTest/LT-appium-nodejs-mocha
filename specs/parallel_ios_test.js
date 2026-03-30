@@ -1,60 +1,71 @@
-const { default: driver } = require("appium-android-driver");
-const { until } = require("selenium-webdriver");
-const { By } = require("selenium-webdriver");
-const by = require("selenium-webdriver/lib/by");
+const webdriver = require("selenium-webdriver");
+const { By, until } = require("selenium-webdriver");
 
 
+const conf_file = process.argv.find(arg => arg.includes('.conf.js')) || "conf/parallel_ios.conf.js";
+const path = require("path");
+const config = require(path.resolve(process.cwd(), conf_file));
 
-require('appium-base-driver')
-var assert= require("assert"),
-  webdriver = require("selenium-webdriver"),
-   conf_file= process.argv[3] || "conf/parallel_ios.conf.js";
- 
 
-var capabilities = require("../" + conf_file).capabilities;
+const LT_USERNAME = config.LT_USERNAME;
+const LT_ACCESS_KEY = config.LT_ACCESS_KEY;
+const capabilities = config.capabilities;
 
-var buildDriver = function(caps) {
+
+async function buildDriver(caps) {
   return new webdriver.Builder()
     .usingServer(
-      "http://" +
-        LT_USERNAME +
-        ":" +
-        LT_ACCESS_KEY +
-        "@mobile-hub.lambdatest.com/wd/hub"
+      `https://${LT_USERNAME}:${LT_ACCESS_KEY}@mobile-hub.lambdatest.com/wd/hub`
     )
     .withCapabilities(caps)
     .build();
-};
+}
 
-capabilities.forEach(function(caps) {
 
-  describe( "Mocha iOS Parallel Test "+caps.browserName, function() {
-    var driver;
-    this.timeout(0);
+capabilities.forEach((caps) => {
+  
+  const deviceDisplayName = caps['lt:options'].deviceName || "iOS Device";
 
-    it ('Application is launched', function name(done) { 
-        driver=buildDriver(caps);
-        driver.findElement(By.xpath('//XCUIElementTypeButton[@name="color"]')).click().then(function(){
-          console.log("Successfully clicked Color");
+  describe(`Mocha iOS Parallel Test - ${deviceDisplayName}`, function () {
+    let driver;
+    this.timeout(0); 
+
+    it("Application is launched and actions performed", async function () {
+      
+      driver = await buildDriver(caps);
+
+      try {
+        console.log(`[${deviceDisplayName}] Starting Test...`);
+
+       
+        await driver.findElement(By.xpath('//XCUIElementTypeButton[@name="color"]')).click();
+        console.log(`[${deviceDisplayName}] Successfully clicked Color`);
+
         
-        });
-        driver.findElement(By.xpath('//XCUIElementTypeStaticText[@name="Notification"]')).click().then(function(){
-          console.log("Successfully clicked Notification");
-        });
-        driver.findElement(By.xpath('//XCUIElementTypeStaticText[@name="Toast"]')).click().then(function(){
-            console.log("Successfully clicked Toast");
-    });
+        await driver.findElement(By.xpath('//XCUIElementTypeStaticText[@name="Notification"]')).click();
+        console.log(`[${deviceDisplayName}] Successfully clicked Notification`);
 
-          var button = driver.wait(until.elementLocated(By.xpath('//XCUIElementTypeStaticText[@name="GeoLocation"]')), 10000);
-           button.click();
-             console.log("Successfully clicked GeoLocation")
-             driver.quit().then(function(){
-            done();
         
-        });
-    
-     });
+        await driver.findElement(By.xpath('//XCUIElementTypeStaticText[@name="Toast"]')).click();
+        console.log(`[${deviceDisplayName}] Successfully clicked Toast`);
 
+        
+        const geoBtn = await driver.wait(
+          until.elementLocated(By.xpath('//XCUIElementTypeStaticText[@name="GeoLocation"]')),
+          15000
+        );
+        await geoBtn.click();
+        console.log(`[${deviceDisplayName}] Successfully clicked GeoLocation`);
+
+      } catch (error) {
+        console.error(`[${deviceDisplayName}] Test failed:`, error.message);
+        throw error;
+      } finally {
+       
+        if (driver) {
+          await driver.quit();
+        }
+      }
     });
-
   });
+});

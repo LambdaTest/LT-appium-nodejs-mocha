@@ -1,17 +1,17 @@
-const { default: driver } = require("appium-android-driver");
+const webdriver = require("selenium-webdriver");
 const { By } = require("selenium-webdriver");
 
+const config = require("../conf/parallel_android.conf.js");
 
 
-require("appium-android-driver")
-var assert= require("assert"),
-  webdriver = require("selenium-webdriver"),
-   conf_file= process.argv[3] || "conf/parallel_android.conf.js";
- 
+const LT_USERNAME = process.env.LT_USERNAME || "your_username";
+const LT_ACCESS_KEY = process.env.LT_ACCESS_KEY || "your_key";
 
-var capabilities = require("../" + conf_file).capabilities;
 
-var buildDriver = function(caps) {
+const capabilities = config.capabilities;
+
+
+function buildDriver(caps) {
   return new webdriver.Builder()
     .usingServer(
       "http://" +
@@ -22,41 +22,36 @@ var buildDriver = function(caps) {
     )
     .withCapabilities(caps)
     .build();
-};
+}
 
-capabilities.forEach(function(caps) {
 
-  
+capabilities.forEach((caps) => {
 
- 
-  describe( "Mocha Parallel Test "+caps.browserName, function() {
-    var driver;
+  const deviceName = caps["appium:deviceName"] || "Android Device";
+
+  describe(`Mocha Android Parallel Test - ${deviceName}`, function () {
+    let driver;
+
+   
     this.timeout(0);
 
-    it("Application is launched" + caps.browserName, function(done) {
+    it("Application is launched and actions performed", async function () {
       driver = buildDriver(caps);
-      driver.findElement(By.id('com.lambdatest.proverbial:id/color')).click().then(function(){
-        console.log("Successfully clicked Color");
-      });
-     
 
-      driver.findElement(By.id('com.lambdatest.proverbial:id/Text')).click().then(function(){
-        console.log("Successfully clicked Text");
+      await driver.findElement(By.id("com.lambdatest.proverbial:id/color")).click();
+      console.log("Successfully clicked Color");
+
+      await driver.findElement(By.id("com.lambdatest.proverbial:id/Text")).click();
+      console.log("Successfully clicked Text");
+
+      await driver.findElement(By.id("com.lambdatest.proverbial:id/notification")).click();
+      console.log("Successfully clicked Notification");
+
+      await driver.findElement(By.id("com.lambdatest.proverbial:id/toast")).click();
+      console.log("Successfully clicked Toast");
+
+      await driver.quit();
     });
-    driver.findElement(By.id('com.lambdatest.proverbial:id/notification')).click().then(function(){
-        console.log("Successfully clicked Notification");
-    })
-    driver.findElement(By.id('com.lambdatest.proverbial:id/toast')).click().then(function(){
-        console.log("Successfully clicked Toast");
-    })
-
-    driver.quit().then(function(){
-       done();
-    });
-    
-        });
-    
-     });
-
   });
-      
+
+});
