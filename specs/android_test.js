@@ -1,53 +1,40 @@
-const { default: driver } = require("appium-android-driver/build/lib/driver");
 const { By } = require("selenium-webdriver");
-const { capabilities } = require("../conf/android.conf");
+const wd = require('wd');
+const path = require('path');
 
-require("appium-android-driver")
-var assert= require("assert"),
-  webdriver = require("selenium-webdriver"),
-   conf_file= process.argv[3] || "conf/Appp.conf.js";
- 
-
+var conf_file = process.argv[3] || "conf/android.conf.js";
 var caps = require("../" + conf_file).capabilities;
+const LT_USERNAME = process.env.LT_USERNAME || "LT_USERNAME";
+const LT_ACCESS_KEY = process.env.LT_ACCESS_KEY || "LT_ACCESS_KEY";
 
 var buildDriver = function(caps) {
-  return new webdriver.Builder()
-    .usingServer(
-      "http://" +
-      LT_USERNAME +
-      ":" +
-      LT_ACCESS_KEY +
-      "@mobile-hub.lambdatest.com/wd/hub"
-    )
-    .withCapabilities(caps)
-    .build();
+  return wd.promiseChainRemote(
+    `https://${LT_USERNAME}:${LT_ACCESS_KEY}@mobile-hub.lambdatest.com/wd/hub`
+  );
 };
 
-
-describe("Mocha Appium Test " + caps.browserName, function() {
+describe("Mocha Appium Test", function() {
   var driver;
   this.timeout(0);
 
-
-    it ('Application is launched', function name(done) { 
-        driver=buildDriver(caps);
-      
-        driver.findElement(By.id('com.lambdatest.proverbial:id/color')).click().then(function(){
-        console.log("Successfully clicked Color");
-    });
-     driver.findElement(By.id('com.lambdatest.proverbial:id/Text')).click().then(function(){
-        console.log("Successfully clicked Text");
-    });
-    driver.findElement(By.id('com.lambdatest.proverbial:id/notification')).click().then(function(){
-        console.log("Successfully clicked Notification");
-    })
-    driver.findElement(By.id('com.lambdatest.proverbial:id/toast')).click().then(function(){
-        console.log("Successfully clicked Toast");
-        driver.quit()
-    })
-});
-
-
+  it('Application is launched', async function() { 
+    driver = buildDriver(caps);
+    await driver.init(caps);
+    
+    await driver.elementById('com.lambdatest.proverbial:id/color').click();
+    console.log("Successfully clicked Color");
+    
+    await driver.elementById('com.lambdatest.proverbial:id/Text').click();
+    console.log("Successfully clicked Text");
+    
+    await driver.elementById('com.lambdatest.proverbial:id/notification').click();
+    console.log("Successfully clicked Notification");
+    
+    await driver.elementById('com.lambdatest.proverbial:id/toast').click();
+    console.log("Successfully clicked Toast");
+    
+    await driver.quit();
+  });
 });
   
 

@@ -2,7 +2,7 @@ LT_USERNAME = process.env.LT_USERNAME || "<your username>";       //Enter your L
 LT_ACCESS_KEY = process.env.LT_ACCESS_KEY || "<your accessKey>";   //Enter your LambdaTest accessKey here
 
 var config = {
-  commanCapabilities: {
+  commonCapabilities: {
     build: "Mocha-Android-Parallel-Sample", //Build name
     name: 'Mocha-Android parallel', // Test name
     tunnel: false, // Make it true to run the localhost through tunnel
@@ -16,13 +16,13 @@ var config = {
     {
       // Desired capabilities
       'platformName':'android', // OS name
-      'deviceName': 'Galaxy S10', // Device name
-      'platformVersion': '11', // OS version
+      'deviceName': 'Galaxy S21', // Device name
+      'platformVersion': '12', // OS version
     },
     {
         'platformName':'android', // OS name
-        'deviceName': 'Galaxy S10+', // Device name
-        'platformVersion': '11', // OS version
+        'deviceName': 'Pixel 6', // Device name
+        'platformVersion': '12', // OS version
     }
   ]
 };
@@ -30,7 +30,7 @@ var config = {
 exports.capabilities = [];
 // Code to support common capabilities
 config.multiCapabilities.forEach(function(caps) {
-  var temp_caps = JSON.parse(JSON.stringify(config.commanCapabilities));
+  var temp_caps = JSON.parse(JSON.stringify(config.commonCapabilities));
   for (var i in caps) temp_caps[i] = caps[i];
   exports.capabilities.push(temp_caps);
 });

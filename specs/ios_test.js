@@ -1,50 +1,40 @@
-const driver= require("appium-base-driver")
-
-//const { default: driver } = require("appium-android-driver/build/lib/driver");
 const { By } = require("selenium-webdriver");
-const { element } = require("wd/lib/element-commands");
+const wd = require('wd');
+const path = require('path');
 
-require("appium-base-driver")
-var assert= require("assert"),
-  webdriver = require("selenium-webdriver"),
-   conf_file= process.argv[3] || "conf/ios.conf.js";
- 
-
+var conf_file = process.argv[3] || "conf/ios.conf.js";
 var caps = require("../" + conf_file).capabilities;
+const LT_USERNAME = process.env.LT_USERNAME || "LT_USERNAME";
+const LT_ACCESS_KEY = process.env.LT_ACCESS_KEY || "LT_ACCESS_KEY";
 
 var buildDriver = function(caps) {
-  return new webdriver.Builder()
-    .usingServer(
-      "http://" +
-      LT_USERNAME +
-      ":" +
-      LT_ACCESS_KEY +
-      "@mobile-hub.lambdatest.com/wd/hub"
-    )
-    .withCapabilities(caps)
-    .build();
+  return wd.promiseChainRemote(
+    `https://${LT_USERNAME}:${LT_ACCESS_KEY}@mobile-hub.lambdatest.com/wd/hub`
+  );
 };
 
-describe("Mocha Appium iOS Test " + caps.browserName, function() {
+describe("Mocha Appium iOS Test", function() {
   var driver;
   this.timeout(0);
-    it ('Application is launched', function name(done) { 
-        driver=buildDriver(caps);
-        driver.findElement(By.xpath('//XCUIElementTypeButton[@name="color"]')).click().then(function(){
-          console.log("Successfully clicked Color");
-        
-        });
-        driver.findElement(By.xpath('//XCUIElementTypeStaticText[@name="Notification"]')).click().then(function(){
-          console.log("Successfully clicked Notification");
-        });
-        driver.findElement(By.xpath('//XCUIElementTypeStaticText[@name="Toast"]')).click().then(function(){
-            console.log("Successfully clicked Toast");
-    });
-         driver.findElement(By.xpath('//XCUIElementTypeButton[@name="Text"]')).click().then(function(){
-             console.log("Successfully clicked Text");
-             driver.quit()
-    });  
-});
+
+  it('Application is launched', async function() { 
+    driver = buildDriver(caps);
+    await driver.init(caps);
+    
+    await driver.elementById('color').click();
+    console.log("Successfully clicked Color");
+    
+    await driver.elementById('Text').click();
+    console.log("Successfully clicked Text");
+    
+    await driver.elementById('notification').click();
+    console.log("Successfully clicked Notification");
+    
+    await driver.elementById('toast').click();
+    console.log("Successfully clicked Toast");
+    
+    await driver.quit();
+  });
 });
 
 
