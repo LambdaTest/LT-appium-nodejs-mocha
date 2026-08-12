@@ -18,11 +18,13 @@ var config = {
       'platformName':'ios', // OS name
       'deviceName': 'iPhone XS', // Device name
       'platformVersion': '13', // OS version
+      'browserName' : '',
     },
     {
         'platformName':'ios', // OS name
     'deviceName': 'iPhone 13 Pro', // Device name
     'platformVersion': '15', // OS version
+    'browserName' : '',
     }
   ]
 };

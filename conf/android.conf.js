@@ -8,6 +8,7 @@ exports.capabilities = {
   'platformName':'android', // OS name
   'deviceName': 'Galaxy S10', // Device name
   'platformVersion': '11', // OS version
+  'browserName' : '',
   'app' : 'lt://proverbial-android',     // Add app (.apk) url here
   'isRealMobile' : true,
   'visual': false,  // To take step by step screenshot
